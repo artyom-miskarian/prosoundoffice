@@ -7,8 +7,8 @@ export const site = {
 } as const
 
 export const contact = {
-  phone: '+374 44 124124',
-  phoneHref: '+37444124124',
+  phone: '+374 41 256371',
+  phoneHref: '+37441256371',
   email: 'info@prosoundoffice.com',
   instagram: '@prosoundyvn',
   instagramUrl: 'https://www.instagram.com/prosoundyvn/',
