@@ -16,7 +16,7 @@ npm run dev
 ```
 
 `npm run dev` and `npm run build` both run `npm run data` first, so the
-generated JSON in `src/data/` is never stale — that's why it isn't committed.
+generated JSON in `src/data/` is never stale, which is why it isn't committed.
 
 The mirrored product shots in `public/images/products/` **are** committed, so a
 fresh clone and a host build both work offline. You only need `npm run images`
@@ -31,8 +31,6 @@ to pull in new or changed photos (`-- --force` to refetch everything).
 | `npm run preview` | Serve the built output |
 | `npm run data` | Rebuild `src/data/*.json` and `public/sitemap.xml` from `data/*.csv` |
 | `npm run images` | Refresh the 60 product shots in `public/images/products/` (`-- --force` to refetch all) |
-| `npm run upload-downloads-r2` | Publish `GroupDownloads/*.zip` to a Cloudflare R2 bucket |
-| `npm run upload-downloads` | Publish `GroupDownloads/*.zip` as a GitHub Release |
 | `npm run typecheck` | TypeScript, no emit |
 
 ## Configuration
@@ -49,7 +47,7 @@ mailto/phone fallback rather than failing silently.
 Without it the Downloads page still lists everything but disables the rows and
 explains why.
 
-Set both in your host's environment variables too, not just locally — Vite
+Set both in your host's environment variables too, not just locally. Vite
 inlines them at build time.
 
 Contact details, nav items and the partner link live in `src/config.ts`.
@@ -60,40 +58,26 @@ Homepage and support copy lives in `src/content.ts`.
 `GroupDownloads/` holds 59 per-enclosure zips totalling ~1 GB, 14 of them over
 25 MB. That does not fit free static hosting: Cloudflare Pages rejects files
 over 25 MB and GitHub Pages caps a repo at 1 GB. So the directory is
-**gitignored** and the archives are hosted separately.
+**gitignored** and the archives are served from Cloudflare R2 instead.
 
-The site only needs a base URL, so either host works with no code change.
-Pick one, then set `VITE_DOWNLOADS_BASE_URL`.
+They are already uploaded, under a `GroupDownloads/` prefix in the bucket. The
+site just needs the public base URL of that folder:
 
-**Cloudflare R2** (10 GB free, no egress charges, tidy URLs). Create a bucket,
-then in the dashboard go to R2 > Manage API Tokens and create a token with
-Object Read & Write. Enable public access under R2 > Settings, either via the
-Public Development URL or a custom domain.
-
-```bash
-brew install awscli
-export R2_ACCOUNT_ID=...
-export R2_BUCKET=prosoundoffice-downloads
-export R2_ACCESS_KEY_ID=...
-export R2_SECRET_ACCESS_KEY=...
-export R2_PUBLIC_URL=https://pub-xxxx.r2.dev
-npm run upload-downloads-r2
+```
+VITE_DOWNLOADS_BASE_URL=https://pub-xxxx.r2.dev/GroupDownloads
 ```
 
-Uses `aws s3 sync` against R2's S3-compatible endpoint, so large files upload
-in parts and a re-run only sends what changed.
+No trailing slash. The Downloads page appends the filename, URL-encoded, so
+`EVO 6E.zip` resolves to `.../GroupDownloads/EVO%206E.zip`. Until the variable
+is set the page still lists every archive but disables the rows and says why.
 
-**GitHub Release** (no size limit, nothing extra to configure).
+To add or replace an archive, drop it in the bucket under the same prefix and
+add the row to `data/GroupDownloads.csv`, then re-run `npm run data`. Anything
+listed in that CSV but missing from the bucket will 404 rather than fail
+visibly, so keep the two in step.
 
-```bash
-brew install gh && gh auth login
-gh repo create prosoundoffice --private --source=. --remote=origin
-npm run upload-downloads
-```
-
-Either script prints the `VITE_DOWNLOADS_BASE_URL` to paste into `.env`. Keep a
-copy of `GroupDownloads/` outside the repo, it is the only source for those
-files.
+The local `GroupDownloads/` directory is still the only copy outside R2, so keep
+it somewhere safe.
 
 ## Data pipeline
 
@@ -111,7 +95,7 @@ newlines mid-cell). Things worth knowing about it:
 - **A few products are filed under two ranges.** Where both entries share a
   photo they're one product entered twice and get merged, with the union of
   their documents. Where the photos differ they're genuinely different
-  enclosures (single vs. double Infrahorn) and both are kept — a product is
+  enclosures (single vs. double Infrahorn) and both are kept. A product is
   addressed as `/products/<range>/<code>`, so their URLs don't clash.
 - **Two crossovers were both called "RES 3 MKII".** They're now qualified by
   their lowest driver, e.g. `RES 3 MKII (21")`, so they can be told apart.

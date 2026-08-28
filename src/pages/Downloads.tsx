@@ -21,12 +21,11 @@ export default function Downloads() {
       <Container className="py-section">
         {!downloadsBaseUrl && (
           <div className="mb-10 border border-line bg-card p-6">
-            <h2 className="caps text-sm">Archives not published yet</h2>
+            <h2 className="caps text-sm">Archive location not configured</h2>
             <p className="mt-3 text-sm leading-relaxed">
               Set <code className="text-bright">VITE_DOWNLOADS_BASE_URL</code> to the
-              GitHub Release that holds the <code className="text-bright">.zip</code>{' '}
-              files. Run <code className="text-bright">npm run upload-downloads</code>{' '}
-              to publish them. See the README.
+              public URL of the bucket folder holding the{' '}
+              <code className="text-bright">.zip</code> files. See the README.
             </p>
           </div>
         )}
