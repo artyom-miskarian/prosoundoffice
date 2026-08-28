@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #0b0b0b;
+  --color-surface: #161616;
+  --color-card: #1e1e1e;
+  --color-line: #2e2e2e;
+
+  --color-bright: #ffffff;
+  --color-muted: #cbcbcb;
+  --color-faint: #8f8f8f;
+
+  --spacing-section: 6rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink text-muted font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply text-bright font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-bright;
+  }
+
+  ::selection {
+    @apply bg-bright text-ink;
+  }
+}
+
+@layer utilities {
+  .caps {
+    @apply uppercase tracking-[0.12em];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
