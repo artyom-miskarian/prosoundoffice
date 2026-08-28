@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -6,6 +6,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const DATA_IN = join(root, 'data')
 const DATA_OUT = join(root, 'src', 'data')
 const CATEGORY_IMAGES = join(root, 'public', 'images', 'categories')
+
+mkdirSync(DATA_OUT, { recursive: true })
 
 function parseCsv(text) {
   const rows = []

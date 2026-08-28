@@ -1,23 +1,15 @@
 node_modules/
 dist/
+.idea/
+.vscode/
 .env
 .env.local
 .DS_Store
 *.local
-
-# 1 GB of product archives — published as a GitHub Release, not committed.
-# See scripts/upload-downloads.mjs and README.md.
-GroupDownloads/
-
-# Generated from data/*.csv by scripts/build-data.mjs
-src/data/*.json
-
-# public/images/products/ IS committed: 5 MB of mirrored product shots. Keeping
-# them in the repo makes deploys self-contained (the build does not need network
-# access to a third-party CDN) and survives the source images moving or
-# disappearing. Refresh them with `npm run images --force`.
-public/sitemap.xml
 *.tsbuildinfo
 
-# Scratch reference screenshots
+GroupDownloads/
+src/data/*.json
+public/sitemap.xml
+
 img*.png
