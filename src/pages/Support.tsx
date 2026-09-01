@@ -35,7 +35,7 @@ export default function Support() {
       <Container className="py-section">
         <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:gap-20">
           <div>
-            <h2 className="caps mb-8 text-2xl sm:text-3xl">{supportSection.formTitle}</h2>
+            <h2 className="caps mb-6 text-xs text-bright">{supportSection.formTitle}</h2>
             <ContactForm />
           </div>
 
