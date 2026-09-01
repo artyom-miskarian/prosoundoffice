@@ -24,7 +24,7 @@ export default function Range() {
         title={titles.range}
         description={
           `All ${products.length} ${partner.name} loudspeakers and subwoofers across ` +
-          `${categories.length} ranges — Vero, Evolution, Resolution, Horn Loaded Bass, ` +
+          `${categories.length} ranges: Vero, Evolution, Resolution, Horn Loaded Bass, ` +
           'Compact and more, with specifications and documentation.'
         }
         path="/products/range"

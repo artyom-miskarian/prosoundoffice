@@ -46,7 +46,7 @@ export default function Product() {
   const summary = product.summary ?? product.description
   const description = summary
     ? productDescription(summary, product.code)
-    : `${partner.name} ${product.code}${product.tagline ? ` — ${product.tagline}` : ''}. ` +
+    : `${partner.name} ${product.code}${product.tagline ? `, ${product.tagline}` : ''}. ` +
       'Full specifications and documentation from the official Armenian distributor.'
 
   return (

@@ -31,7 +31,7 @@ export default function CrossoverDetail() {
   const components = [...new Set(crossover.rows.map((row) => row.component))].filter(Boolean)
 
   const intro =
-    `Recommended ${partner.name} processor settings for ${crossover.title} — ` +
+    `Recommended ${partner.name} processor settings for ${crossover.title}: ` +
     `crossover points, slopes, delay, polarity and gain across ${bands} ` +
     `${bands === 1 ? 'band' : 'bands'}` +
     (components.length ? ` (${components.join(', ')}).` : '.')

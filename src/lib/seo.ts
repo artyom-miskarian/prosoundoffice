@@ -19,7 +19,7 @@ export const pageTitle = (title?: string) =>
   title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline}`
 
 export const home = {
-  title: `${partner.name} Armenia — Official Distributor`,
+  title: `Official ${partner.name} Distributor in Armenia`,
   description:
     `Official ${partner.name} distributor in Armenia. ${site.legalName} supplies, installs ` +
     'and services professional loudspeakers and sound systems from Yerevan.',
@@ -27,10 +27,10 @@ export const home = {
 
 export const titles = {
   products: `${partner.name} Loudspeakers & Sound Systems`,
-  range: `The Complete ${partner.name} Range — All Models`,
+  range: `The Complete ${partner.name} Range`,
   crossovers: `${partner.name} Crossover Settings & DSP Presets`,
   downloads: `${partner.name} Manuals, Spec Sheets & CAD Downloads`,
-  support: `Support & Contact — ${partner.name} Armenia`,
+  support: `${partner.name} Support & Contact in Armenia`,
 } as const
 
 const TITLE_BUDGET = 70
@@ -40,7 +40,7 @@ export function fitTitle(head: string, ...optional: (string | null | undefined)[
   let parts = optional.filter((part): part is string => Boolean(part))
 
   for (;;) {
-    const candidate = [head, ...parts].join(' — ')
+    const candidate = [head, ...parts].join(' | ')
     if (parts.length === 0 || candidate.length + suffix <= TITLE_BUDGET) return candidate
     parts = parts.slice(0, -1)
   }

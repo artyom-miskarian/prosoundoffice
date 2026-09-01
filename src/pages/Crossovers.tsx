@@ -20,7 +20,7 @@ export default function Crossovers() {
         title={titles.crossovers}
         description={
           `Recommended DSP and crossover settings for ${crossovers.length} ` +
-          `${partner.name} system configurations — crossover points, slopes, delay, ` +
+          `${partner.name} system configurations: crossover points, slopes, delay, ` +
           'polarity and gain for each band.'
         }
         path="/crossovers"

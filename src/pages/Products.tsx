@@ -18,7 +18,7 @@ const SPELLING =
   'manufacturer, founded by Tony Andrews, and this is its official Armenian distributor.'
 
 const DESCRIPTION =
-  'Funktion-One loudspeakers and sound systems in Armenia — Evolution, Resolution, ' +
+  'Funktion-One loudspeakers and sound systems in Armenia: Evolution, Resolution, ' +
   'Horn Loaded Bass, Compact and Monitor ranges, stocked and supported from Yerevan.'
 
 export default function Products() {
@@ -62,8 +62,8 @@ export default function Products() {
           <h2 className="caps text-lg">Looking for something else?</h2>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed">
             The ranges above are what we stock. {partner.name} builds {products.length}{' '}
-            enclosures in total — Vero, Vero VX, Bass Reflex, Dance Stack and Public
-            Address included — and we can source any of them. Full specifications and
+            enclosures in total (Vero, Vero VX, Bass Reflex, Dance Stack and Public
+            Address included), and we can source any of them. Full specifications and
             documentation for every model are on the site.
           </p>
           <Button to="/products/range" variant="outline" className="mt-8">
