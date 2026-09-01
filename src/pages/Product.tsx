@@ -106,7 +106,7 @@ export default function Product() {
           <div className="grid items-center gap-10 lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-16">
             <div>
               <h1 className="caps text-3xl sm:text-4xl lg:text-5xl">
-                <span className="block text-xs text-faint sm:text-sm">{partner.name}</span>
+                <span className="block text-xs text-faint sm:text-sm">{partner.name} </span>
                 {product.code}
               </h1>
               {product.tagline && (
