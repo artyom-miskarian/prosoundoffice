@@ -48,7 +48,7 @@ export const nav = [
 ] as const
 
 export const footerNav = [
-  { label: 'Products', to: '/products' },
+  { label: 'Products in Stock', to: '/products' },
   { label: `Complete ${partner.name} Range`, to: '/products/range' },
   { label: 'Support', to: '/support' },
 ] as const
