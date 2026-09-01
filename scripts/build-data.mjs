@@ -363,24 +363,45 @@ write('featured.json', featured.map((p) => p.slug))
 
 const siteUrl = (process.env.SITE_URL ?? 'https://prosoundoffice.com').replace(/\/$/, '')
 
-const buildDate = new Date().toISOString()
-function gitDate(...paths) {
+const CATALOG_CSVS = [
+  'data/Categories.csv',
+  'data/Products.csv',
+  'data/Overviews.csv',
+  'data/Specifications.csv',
+  'data/AdditionalSpecifications.csv',
+  'data/PerformanceFeatures.csv',
+]
+const CROSSOVER_CSVS = ['data/Crossovers.csv', 'data/CrossoverSettings.csv']
+const LASTMOD_FILE = join(DATA_IN, 'lastmod.json')
+
+function git(args) {
   try {
-    const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...paths], {
+    return execFileSync('git', args, {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
-    return out || buildDate
   } catch {
-    return buildDate
+    return ''
   }
 }
 
-const catalogDate = gitDate('data/Categories.csv', 'data/Products.csv', 'data/Overviews.csv',
-  'data/Specifications.csv', 'data/AdditionalSpecifications.csv', 'data/PerformanceFeatures.csv')
-const crossoverDate = gitDate('data/Crossovers.csv', 'data/CrossoverSettings.csv')
-const staticDate = gitDate('src', 'index.html')
+const isShallow = git(['rev-parse', '--is-shallow-repository']) !== 'false'
+
+let lastmod
+if (isShallow) {
+  lastmod = existsSync(LASTMOD_FILE) ? JSON.parse(readFileSync(LASTMOD_FILE, 'utf8')) : {}
+} else {
+  lastmod = {
+    catalog: git(['log', '-1', '--format=%cI', '--', ...CATALOG_CSVS]),
+    crossovers: git(['log', '-1', '--format=%cI', '--', ...CROSSOVER_CSVS]),
+  }
+  writeFileSync(LASTMOD_FILE, `${JSON.stringify(lastmod, null, 2)}\n`)
+}
+
+const catalogDate = lastmod.catalog ?? ''
+const crossoverDate = lastmod.crossovers ?? ''
+const staticDate = catalogDate
 
 const productSlugCounts = products.reduce(
   (acc, p) => acc.set(p.slug, (acc.get(p.slug) ?? 0) + 1),
@@ -433,13 +454,17 @@ writeFileSync(
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     indexable
-      .map((r) => `  <url><loc>${siteUrl}${r.path}</loc><lastmod>${r.lastmod}</lastmod></url>`)
+      .map((r) => {
+        const mod = r.lastmod ? `<lastmod>${r.lastmod}</lastmod>` : ''
+        return `  <url><loc>${siteUrl}${r.path}</loc>${mod}</url>`
+      })
       .join('\n') +
     `\n</urlset>\n`,
 )
 console.log(
   `  public/sitemap.xml       ${String(indexable.length).padStart(4)} routes ` +
-  `(${routes.length - indexable.length} prerendered but noindex)`,
+  `(${routes.length - indexable.length} noindex, lastmod ` +
+  `${catalogDate ? (isShallow ? 'from data/lastmod.json' : 'from git') : 'omitted'})`,
 )
 
 const legacySlug = (code) => code.toLowerCase().replace(/\s+/g, '-')

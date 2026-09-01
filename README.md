@@ -117,6 +117,13 @@ and there is no SPA fallback to rely on. `dist/404.html` also turns off
 Cloudflare Pages' automatic single-page-app behaviour, which is what makes
 unknown paths return a genuine HTTP 404 rather than a 200 with an empty shell.
 
+`data/lastmod.json` records when the catalogue and crossover CSVs last changed,
+and **is committed**. Cloudflare clones the repo shallow, so `git log` there
+cannot date individual files; without the committed stamp every URL would get
+the build timestamp on every deploy, which is exactly the inaccuracy that makes
+Google discard `lastmod`. `npm run data` refreshes the file when it has full
+history and reads it otherwise, so commit it alongside any CSV change.
+
 `public/_redirects` is **generated** by `npm run data` (and gitignored, like
 `sitemap.xml`). It holds the 301s from the old Wix product URLs
 (`/products-1/<code>`) to their current paths, derived from the product codes so
