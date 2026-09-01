@@ -10,11 +10,14 @@
     "data": "node scripts/build-data.mjs",
     "images": "node scripts/fetch-product-images.mjs",
     "dev": "npm run data && vite",
-    "build": "npm run data && tsc -b && vite build",
+    "build": "npm run data && tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node scripts/prerender.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "prerender": "node scripts/prerender.mjs",
+    "images:optimize": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3"
@@ -24,6 +27,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.1",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"

@@ -15,9 +15,20 @@ export const contact = {
   location: 'Yerevan, Armenia',
 } as const
 
+export const address = {
+  street: '91 Teryan St',
+  city: 'Yerevan',
+  region: 'Yerevan',
+  postalCode: '',
+  country: 'AM',
+  openingHours: '',
+  mapUrl: '',
+} as const
+
 export const partner = {
   name: 'Funktion-One',
   url: 'https://funktion-one.com',
+  alsoWrittenAs: ['Function One', 'Function-One', 'Function 1'],
 } as const
 
 export const web3formsKey = import.meta.env.VITE_WEB3FORMS_KEY ?? ''

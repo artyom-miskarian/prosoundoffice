@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { partner } from '../config'
 import type { Product } from '../lib/types'
 
 export default function ProductImage({
@@ -17,7 +18,7 @@ export default function ProductImage({
   return (
     <img
       src={src}
-      alt={product.code}
+      alt={`${partner.name} ${product.code}${product.tagline ? ` — ${product.tagline}` : ''}`}
       className={className}
       sizes={sizes}
       loading={loading}

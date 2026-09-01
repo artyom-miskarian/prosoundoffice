@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -362,25 +363,104 @@ write('featured.json', featured.map((p) => p.slug))
 
 const siteUrl = (process.env.SITE_URL ?? 'https://prosoundoffice.com').replace(/\/$/, '')
 
+const buildDate = new Date().toISOString()
+function gitDate(...paths) {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...paths], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+    return out || buildDate
+  } catch {
+    return buildDate
+  }
+}
+
+const catalogDate = gitDate('data/Categories.csv', 'data/Products.csv', 'data/Overviews.csv',
+  'data/Specifications.csv', 'data/AdditionalSpecifications.csv', 'data/PerformanceFeatures.csv')
+const crossoverDate = gitDate('data/Crossovers.csv', 'data/CrossoverSettings.csv')
+const staticDate = gitDate('src', 'index.html')
+
+const productSlugCounts = products.reduce(
+  (acc, p) => acc.set(p.slug, (acc.get(p.slug) ?? 0) + 1),
+  new Map(),
+)
+
+function canonicalCategoryFor(slug) {
+  const same = products.filter((p) => p.slug === slug)
+  if (productSlugCounts.get(slug) < 2) return same[0].categorySlug
+  const preferred = same.find((p) => categoryBySlug.get(p.categorySlug)?.visible) ?? same[0]
+  return preferred.categorySlug
+}
+
 const routes = [
-  '/',
-  '/products',
-  '/downloads',
-  '/crossovers',
-  '/support',
-  ...categories.filter((c) => c.visible).map((c) => `/products/${c.slug}`),
-  ...products.filter((p) => p.visible).map((p) => `/products/${p.categorySlug}/${p.slug}`),
-  ...crossovers.map((c) => `/crossovers/${c.slug}`),
+  { path: '/', indexable: true, lastmod: staticDate },
+  { path: '/products', indexable: true, lastmod: catalogDate },
+  { path: '/products/range', indexable: true, lastmod: catalogDate },
+  { path: '/downloads', indexable: true, lastmod: catalogDate },
+  { path: '/crossovers', indexable: true, lastmod: crossoverDate },
+  { path: '/support', indexable: true, lastmod: staticDate },
+  ...categories.map((c) => ({
+    path: `/products/${c.slug}`,
+    indexable: c.visible,
+    lastmod: catalogDate,
+  })),
+  ...products.map((p) => ({
+    path: `/products/${p.categorySlug}/${p.slug}`,
+    indexable: canonicalCategoryFor(p.slug) === p.categorySlug,
+    lastmod: catalogDate,
+  })),
+  ...crossovers.map((c) => ({
+    path: `/crossovers/${c.slug}`,
+    indexable: true,
+    lastmod: crossoverDate,
+  })),
 ]
 
+const dupeRoutes = routes
+  .map((r) => r.path)
+  .filter((p, i, all) => all.indexOf(p) !== i)
+if (dupeRoutes.length) {
+  throw new Error(`duplicate routes: ${[...new Set(dupeRoutes)].join(', ')}`)
+}
+
+write('routes.json', routes)
+
+const indexable = routes.filter((r) => r.indexable)
 writeFileSync(
   join(root, 'public', 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    routes.map((r) => `  <url><loc>${siteUrl}${r}</loc></url>`).join('\n') +
+    indexable
+      .map((r) => `  <url><loc>${siteUrl}${r.path}</loc><lastmod>${r.lastmod}</lastmod></url>`)
+      .join('\n') +
     `\n</urlset>\n`,
 )
-console.log(`  public/sitemap.xml       ${String(routes.length).padStart(4)} routes`)
+console.log(
+  `  public/sitemap.xml       ${String(indexable.length).padStart(4)} routes ` +
+  `(${routes.length - indexable.length} prerendered but noindex)`,
+)
+
+const legacySlug = (code) => code.toLowerCase().replace(/\s+/g, '-')
+
+const legacy = new Map()
+for (const p of products) {
+  const from = `/products-1/${legacySlug(p.code)}`
+  const to = `/products/${p.categorySlug}/${p.slug}`
+  const existing = legacy.get(from)
+  if (existing && !categoryBySlug.get(p.categorySlug)?.visible) continue
+  legacy.set(from, to)
+}
+
+const redirects = [
+  ...[...legacy].map(([from, to]) => `${from}  ${to}  301`),
+  '/products-1  /products  301',
+  '/contacts  /support  301',
+]
+
+writeFileSync(join(root, 'public', '_redirects'), `${redirects.join('\n')}\n`)
+console.log(`  public/_redirects        ${String(redirects.length).padStart(4)} rules`)
 
 const warn = []
 const missingImage = products.filter((p) => !p.remoteImage).map((p) => p.code)

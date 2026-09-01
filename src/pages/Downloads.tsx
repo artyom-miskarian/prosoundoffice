@@ -3,19 +3,30 @@ import Container from '../components/Container'
 import PageHeader from '../components/PageHeader'
 import { RowList, Row, RowGroupHeading, DownloadIcon } from '../components/RowList'
 import { archives, groupByCategory } from '../lib/catalog'
-import { archiveUrl, downloadsBaseUrl } from '../config'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import Seo from '../components/Seo'
+import { archiveUrl, downloadsBaseUrl, partner } from '../config'
+import { titles } from '../lib/seo'
+import { graph } from '../lib/jsonLd'
 
 const INTRO =
   'Each archive bundles the full document set for one enclosure: specification sheets, CAD, drawings and rigging information.'
 
 export default function Downloads() {
-  useDocumentTitle('Downloads', INTRO)
-
   const groups = groupByCategory(archives)
 
   return (
     <>
+      <Seo
+        title={titles.downloads}
+        description={
+          `Download the full ${partner.name} document set for any enclosure: ` +
+          'specification sheets, CAD drawings, rigging information and manuals, ' +
+          `${archives.length} archives in all.`
+        }
+        path="/downloads"
+        jsonLd={graph()}
+      />
+
       <PageHeader title="Downloads" intro={<p>{INTRO}</p>} />
 
       <Container className="py-section">

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { partner } from '../config'
 import type { Category } from '../lib/types'
 
 export default function CategoryCard({ category }: { category: Category }) {
@@ -10,7 +11,7 @@ export default function CategoryCard({ category }: { category: Category }) {
       <div className="relative aspect-16/9 shrink-0 overflow-hidden bg-ink">
         <img
           src={category.image}
-          alt={category.title}
+          alt={`${partner.name} ${category.title} series loudspeakers`}
           loading="lazy"
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

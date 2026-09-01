@@ -37,7 +37,12 @@ export function Row({ label, meta, to, href, icon, disabledNote }: RowProps) {
           {content}
         </Link>
       ) : (
-        <a href={href} className={`${rowClass} group hover:bg-line/60`}>
+        <a
+        href={href}
+        target="_blank"
+        rel="noopener nofollow"
+        className={`${rowClass} group hover:bg-line/60`}
+      >
           {content}
         </a>
       )}

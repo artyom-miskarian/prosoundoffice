@@ -4,25 +4,45 @@ import PageHeader from '../components/PageHeader'
 import ProductCard from '../components/ProductCard'
 import Button from '../components/Button'
 import NotFound from './NotFound'
+import Seo from '../components/Seo'
 import { findCategory, productsInCategory } from '../lib/catalog'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import { partner } from '../config'
+import { categoryTitle } from '../lib/seo'
+import { breadcrumbs, categoryPage, graph } from '../lib/jsonLd'
 
 export default function Category() {
   const { categorySlug } = useParams()
   const category = findCategory(categorySlug)
 
-  useDocumentTitle(category?.title ?? 'Not found', category?.description ?? undefined)
-
   if (!category) return <NotFound />
 
   const products = productsInCategory(category.slug)
+  const path = `/products/${category.slug}`
 
   return (
     <>
+      <Seo
+        title={categoryTitle(category.title)}
+        description={
+          category.description ??
+          `${partner.name} ${category.title} loudspeakers, distributed in Armenia by Pro Sound Office.`
+        }
+        path={path}
+        image={category.image}
+        noindex={!category.visible}
+        jsonLd={graph(
+          categoryPage(category, path, products),
+          breadcrumbs([
+            { name: 'Products', path: '/products' },
+            { name: category.title, path },
+          ]),
+        )}
+      />
+
       <div className="relative border-b border-line">
         <img
           src={category.image}
-          alt={category.title}
+          alt={`${partner.name} ${category.title} series loudspeakers`}
           className="h-56 w-full object-cover sm:h-72 lg:h-80"
         />
         <div
@@ -60,9 +80,14 @@ export default function Category() {
               We don&apos;t currently stock models from this range. Get in touch and
               we&apos;ll source what you need.
             </p>
-            <Button to="/support" variant="outline" className="mt-8">
-              Contact Us
-            </Button>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Button to="/products/range" variant="outline">
+                See this range
+              </Button>
+              <Button to="/support" variant="outline">
+                Contact Us
+              </Button>
+            </div>
           </div>
         )}
       </Container>

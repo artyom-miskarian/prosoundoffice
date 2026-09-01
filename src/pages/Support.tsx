@@ -3,22 +3,33 @@ import PageHeader from '../components/PageHeader'
 import ContactForm from '../components/ContactForm'
 import { RowList, Row, ArrowIcon } from '../components/RowList'
 import { archives, crossovers } from '../lib/catalog'
-import { contact } from '../config'
+import Seo from '../components/Seo'
+import { address, contact, partner } from '../config'
 import { supportSection } from '../content'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import { titles } from '../lib/seo'
+import { contactPage, graph } from '../lib/jsonLd'
 
 const DETAILS = [
   { label: 'Phone', value: contact.phone, href: `tel:${contact.phoneHref}` },
   { label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
   { label: 'Instagram', value: contact.instagram, href: contact.instagramUrl },
-  { label: 'Based in', value: contact.location },
+  { label: 'Based in', value: address.street ? `${address.street}, ${address.city}` : contact.location },
 ]
 
 export default function Support() {
-  useDocumentTitle('Support', supportSection.intro)
-
   return (
     <>
+      <Seo
+        title={titles.support}
+        description={
+          `Contact ${partner.name}'s official distributor in Armenia. Technical ` +
+          'documentation, crossover settings, product archives and a direct line to ' +
+          `our engineers in ${address.city}.`
+        }
+        path="/support"
+        jsonLd={graph(contactPage('/support'))}
+      />
+
       <PageHeader title={supportSection.title} intro={<p>{supportSection.intro}</p>} />
 
       <Container className="py-section">

@@ -1,12 +1,17 @@
 import Container from '../components/Container'
 import Button from '../components/Button'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import Seo from '../components/Seo'
 
 export default function NotFound() {
-  useDocumentTitle('Page not found')
-
   return (
     <Container className="py-32 text-center">
+      <Seo
+        title="Page not found"
+        description="That page doesn't exist. It may have moved when the site was rebuilt."
+        path="/404"
+        noindex
+      />
+
       <p className="caps text-xs text-faint">Error 404</p>
       <h1 className="caps mt-5 text-3xl sm:text-4xl">Page not found</h1>
       <p className="mx-auto mt-6 max-w-md text-[15px] leading-relaxed">

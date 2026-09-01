@@ -1,6 +1,6 @@
 export const hero = {
   headline:
-    'An independent Yerevan-based company specializing in sound engineering and audio equipment distribution.',
+    'Official Funktion-One distributor in Armenia. Professional loudspeakers, sound system design and installation, from Yerevan.',
   primaryCta: { label: 'Browse Products', to: '/products' },
   secondaryCta: { label: 'Reach Out To Us', to: '/support' },
 } as const

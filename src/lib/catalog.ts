@@ -24,10 +24,31 @@ export const findCategory = (slug?: string) =>
 export const findProduct = (categorySlug?: string, slug?: string) =>
   products.find((p) => p.categorySlug === categorySlug && p.slug === slug)
 
+const byCode = (a: Product, b: Product) =>
+  a.code.localeCompare(b.code, 'en', { numeric: true })
+
 export const productsInCategory = (categorySlug: string) =>
-  products
-    .filter((p) => p.categorySlug === categorySlug && p.visible)
-    .sort((a, b) => a.code.localeCompare(b.code, 'en', { numeric: true }))
+  products.filter((p) => p.categorySlug === categorySlug && p.visible).sort(byCode)
+
+export const allInCategory = (categorySlug: string) =>
+  products.filter((p) => p.categorySlug === categorySlug).sort(byCode)
+
+const slugCounts = products.reduce(
+  (acc, p) => acc.set(p.slug, (acc.get(p.slug) ?? 0) + 1),
+  new Map<string, number>(),
+)
+
+export const isAmbiguousCode = (product: Product) =>
+  (slugCounts.get(product.slug) ?? 0) > 1
+
+export function canonicalProductPath(product: Product) {
+  const same = products.filter((p) => p.slug === product.slug)
+  if (same.length < 2) return `/products/${product.categorySlug}/${product.slug}`
+
+  const preferred =
+    same.find((p) => categories.find((c) => c.slug === p.categorySlug)?.visible) ?? same[0]
+  return `/products/${preferred.categorySlug}/${preferred.slug}`
+}
 
 export const findCrossover = (slug?: string) =>
   crossovers.find((c) => c.slug === slug)

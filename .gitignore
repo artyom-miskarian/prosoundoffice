@@ -13,3 +13,6 @@ src/data/*.json
 public/sitemap.xml
 
 img*.png
+
+dist-server/
+public/_redirects

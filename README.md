@@ -29,8 +29,9 @@ to pull in new or changed photos (`-- --force` to refetch everything).
 | `npm run dev` | Dev server on :5173 |
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the built output |
-| `npm run data` | Rebuild `src/data/*.json` and `public/sitemap.xml` from `data/*.csv` |
+| `npm run data` | Rebuild `src/data/*.json`, `public/sitemap.xml` and `public/_redirects` from `data/*.csv` |
 | `npm run images` | Refresh the 60 product shots in `public/images/products/` (`-- --force` to refetch all) |
+| `npm run images:optimize` | Re-encode `public/images/categories` and `/brand` to WebP and rebuild the social card |
 | `npm run typecheck` | TypeScript, no emit |
 
 ## Configuration
@@ -111,15 +112,51 @@ the current revision.
 
 Build command `npm run build`, publish directory `dist`.
 
-`public/_redirects` sends every path to `index.html`, which is what makes deep
-links like `/products/compact/f101-2` work on a static host. Netlify and
-Cloudflare Pages both honour it. On GitHub Pages you'd need the
-`404.html` copy trick instead.
+Every route is prerendered to its own `index.html`, so deep links are real files
+and there is no SPA fallback to rely on. `dist/404.html` also turns off
+Cloudflare Pages' automatic single-page-app behaviour, which is what makes
+unknown paths return a genuine HTTP 404 rather than a 200 with an empty shell.
 
-The site renders client-side, so crawlers see an empty shell on first load.
-`sitemap.xml` and per-route titles are in place; if search visibility becomes
-important, prerendering (`vite-plugin-prerender` or moving to a static-export
-framework) is the next step.
+`public/_redirects` is **generated** by `npm run data` (and gitignored, like
+`sitemap.xml`). It holds the 301s from the old Wix product URLs
+(`/products-1/<code>`) to their current paths, derived from the product codes so
+it cannot drift from the catalogue.
+
+## Prerendering
+
+`npm run build` runs four steps: build the data, build the client bundle, build
+an SSR bundle from `src/entry-server.tsx`, then `scripts/prerender.mjs` renders
+each route in `src/data/routes.json` and writes it into the built shell.
+
+It uses `prerender` from `react-dom/static` and `StaticRouter` from
+`react-router-dom` — both already present, so there is no extra dependency and
+no static-export framework. `npm run dev` is untouched and stays a plain SPA.
+
+React 19 hoists `<title>`, `<meta>` and `<link>` rendered anywhere in the tree,
+so `src/components/Seo.tsx` is the single source of per-route metadata and works
+identically for the prerender and for client-side navigation. JSON-LD is built
+in `src/lib/jsonLd.ts`.
+
+The prerender fails the build if a route renders the 404 component or produces
+no `<title>`, so a drift between `routes.json` and the router cannot ship
+silently.
+
+`vite preview` is **not** representative here: it has its own SPA fallback that
+serves `index.html` for every path, masking whether the per-route files resolve.
+Check deep links on a Cloudflare Pages preview deployment instead.
+
+## Before deploying: verify the address
+
+`src/config.ts` exports an `address` block that feeds the `LocalBusiness`
+structured data. The street was taken from Funktion-One's own Armenia
+distributor listing and **has not been confirmed**. Confirm or correct
+`street`, and fill in `postalCode`, `openingHours` and `mapUrl` — each is
+omitted from the schema while empty rather than guessed.
+
+Funktion-One's distributor page also lists this territory under a different
+business name, an undiallable phone number and a personal email, with no link
+back to this site. Getting that corrected is the most valuable backlink
+available.
 
 ## What changed from the Wix site
 

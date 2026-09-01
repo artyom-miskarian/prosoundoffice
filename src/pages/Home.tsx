@@ -5,20 +5,29 @@ import SectionHeading from '../components/SectionHeading'
 import ProductCard from '../components/ProductCard'
 import { featuredProducts, services } from '../lib/catalog'
 import { hero, partnerSection, productsSection, servicesSection } from '../content'
-import { partner, site } from '../config'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import Seo from '../components/Seo'
+import { partner } from '../config'
+import { home } from '../lib/seo'
+import { graph } from '../lib/jsonLd'
 
 export default function Home() {
-  useDocumentTitle('', site.description)
-
   return (
     <>
+      <Seo
+        title={home.title}
+        description={home.description}
+        path="/"
+        jsonLd={graph()}
+      />
+
       <section className="relative overflow-hidden border-b border-line bg-black">
 
         <img
-          src="/images/brand/sound-sphere.png"
+          src="/images/brand/sound-sphere.webp"
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none absolute top-1/2 right-[-18%] w-[560px] max-w-none -translate-y-1/2 opacity-60 select-none sm:right-[-8%] lg:right-[2%] lg:w-[620px] lg:opacity-100"
         />
 
@@ -62,7 +71,7 @@ export default function Home() {
       <div
         aria-hidden="true"
         className="h-40 border-b border-line bg-cover bg-center sm:h-56"
-        style={{ backgroundImage: 'url(/images/brand/banner.png)' }}
+        style={{ backgroundImage: 'url(/images/brand/banner.webp)' }}
       />
 
       <section className="border-b border-line bg-ink py-section">
@@ -88,7 +97,7 @@ export default function Home() {
 
           <div className="mt-10 flex justify-end">
             <Button to="/products" variant="outline">
-              See All
+              See all {partner.name} ranges
             </Button>
           </div>
         </Container>
@@ -99,24 +108,38 @@ export default function Home() {
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
               <img
-                src="/images/brand/funktion-one.png"
-                alt={partner.name}
+                src="/images/brand/funktion-one.webp"
+                alt={`${partner.name} logo`}
                 className="h-7 w-auto sm:h-9"
                 loading="lazy"
+                decoding="async"
               />
-              <p className="mt-10 text-lg leading-relaxed text-bright sm:text-xl">
+              <h2 className="caps mt-8 text-2xl sm:text-3xl">
+                {partner.name} in Armenia
+              </h2>
+              <p className="mt-8 text-lg leading-relaxed text-bright sm:text-xl">
                 {partnerSection.lead}
               </p>
               <p className="mt-6 text-[15px] leading-relaxed">{partnerSection.body}</p>
-              <Button to={partnerSection.cta.to} variant="outline" className="mt-10">
-                {partnerSection.cta.label}
-              </Button>
+              <div className="mt-10 flex flex-wrap items-center gap-8">
+                <Button to={partnerSection.cta.to} variant="outline">
+                  {partnerSection.cta.label}
+                </Button>
+                <a
+                  href={partner.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="caps text-xs text-faint transition-colors hover:text-bright"
+                >
+                  funktion-one.com
+                </a>
+              </div>
             </div>
 
             <div className="order-first lg:order-last">
 
               <img
-                src="/images/brand/tony-andrews.png"
+                src="/images/brand/tony-andrews.webp"
                 alt="Tony Andrews, founder of Funktion-One"
                 className="mx-auto w-full max-w-[480px] lg:mr-0"
                 loading="lazy"

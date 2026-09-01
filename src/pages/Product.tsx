@@ -6,9 +6,17 @@ import SpecTable from '../components/SpecTable'
 import Button from '../components/Button'
 import { RowList, Row, DownloadIcon } from '../components/RowList'
 import NotFound from './NotFound'
-import { archives, findCategory, findProduct } from '../lib/catalog'
-import { archiveUrl } from '../config'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import {
+  archives,
+  canonicalProductPath,
+  findCategory,
+  findProduct,
+  isAmbiguousCode,
+} from '../lib/catalog'
+import Seo from '../components/Seo'
+import { archiveUrl, partner } from '../config'
+import { productDescription, productTitle } from '../lib/seo'
+import { breadcrumbs, graph, product as productLd } from '../lib/jsonLd'
 import type { Product as ProductType } from '../lib/types'
 
 function tabsFor(product: ProductType) {
@@ -26,8 +34,6 @@ export default function Product() {
   const product = findProduct(categorySlug, productSlug)
   const category = findCategory(categorySlug)
 
-  useDocumentTitle(product?.code ?? 'Not found', product?.summary ?? undefined)
-
   const tabs = product ? tabsFor(product) : []
   const [active, setActive] = useState(tabs[0]?.id ?? 'overview')
 
@@ -35,9 +41,38 @@ export default function Product() {
 
   const current = tabs.some((t) => t.id === active) ? active : (tabs[0]?.id ?? '')
   const archive = archives.find((a) => a.code === product.code)
+  const path = `/products/${product.categorySlug}/${product.slug}`
+
+  const summary = product.summary ?? product.description
+  const description = summary
+    ? productDescription(summary, product.code)
+    : `${partner.name} ${product.code}${product.tagline ? ` — ${product.tagline}` : ''}. ` +
+      'Full specifications and documentation from the official Armenian distributor.'
 
   return (
     <>
+      <Seo
+        title={productTitle(
+          product.code,
+          product.tagline,
+          isAmbiguousCode(product) ? category?.title : undefined,
+        )}
+        description={description}
+        path={path}
+        canonicalPath={canonicalProductPath(product)}
+        image={product.image}
+        jsonLd={graph(
+          productLd(product, path),
+          breadcrumbs([
+            { name: 'Products', path: '/products' },
+            ...(category
+              ? [{ name: category.title, path: `/products/${category.slug}` }]
+              : []),
+            { name: product.code, path },
+          ]),
+        )}
+      />
+
       <div className="border-b border-line bg-surface">
         <Container className="py-12 sm:py-16">
           <nav aria-label="Breadcrumb" className="mb-8">
@@ -45,7 +80,14 @@ export default function Product() {
               {[
                 { label: 'Products', to: '/products' },
                 ...(category
-                  ? [{ label: category.title, to: `/products/${category.slug}` }]
+                  ? [
+                      {
+                        label: category.title,
+                        to: category.visible
+                          ? `/products/${category.slug}`
+                          : '/products/range',
+                      },
+                    ]
                   : []),
               ].map((crumb) => (
                 <li key={crumb.to} className="flex items-center gap-2">
@@ -63,7 +105,10 @@ export default function Product() {
 
           <div className="grid items-center gap-10 lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-16">
             <div>
-              <h1 className="caps text-3xl sm:text-4xl lg:text-5xl">{product.code}</h1>
+              <h1 className="caps text-3xl sm:text-4xl lg:text-5xl">
+                <span className="block text-xs text-faint sm:text-sm">{partner.name}</span>
+                {product.code}
+              </h1>
               {product.tagline && (
                 <p className="mt-5 text-lg text-muted sm:text-xl">{product.tagline}</p>
               )}
@@ -117,13 +162,27 @@ export default function Product() {
             ))}
           </div>
 
+          {tabs.map((tab) => {
+            const shown = current === tab.id
+
+            return (
           <div
+            key={tab.id}
             role="tabpanel"
-            id={`panel-${current}`}
-            aria-labelledby={`tab-${current}`}
-            tabIndex={0}
+            id={`panel-${tab.id}`}
+            aria-labelledby={`tab-${tab.id}`}
+            hidden={!shown}
+            tabIndex={shown ? 0 : -1}
           >
-            {current === 'overview' && product.description && (
+            {tab.id === 'overview' ? (
+              <h2 className={product.headline ? 'mb-6 max-w-3xl text-xl sm:text-2xl' : 'sr-only'}>
+                {product.headline || tab.label}
+              </h2>
+            ) : (
+              <h2 className="sr-only">{tab.label}</h2>
+            )}
+
+            {tab.id === 'overview' && product.description && (
               <div className="max-w-3xl space-y-5 text-[15px] leading-relaxed">
                 {product.description.split('\n\n').map((para) => (
                   <p key={para}>{para}</p>
@@ -131,7 +190,7 @@ export default function Product() {
               </div>
             )}
 
-            {current === 'performance' && (
+            {tab.id === 'performance' && (
               <ul className="grid max-w-4xl gap-x-12 gap-y-4 sm:grid-cols-2">
                 {product.features.map((feature) => (
                   <li key={feature} className="flex gap-4 text-[15px] leading-relaxed">
@@ -142,13 +201,13 @@ export default function Product() {
               </ul>
             )}
 
-            {current === 'specification' && product.specs && (
+            {tab.id === 'specification' && product.specs && (
               <div className="max-w-3xl">
                 <SpecTable specs={product.specs} />
               </div>
             )}
 
-            {current === 'drawings' && (
+            {tab.id === 'drawings' && (
               <div className="grid gap-10 lg:grid-cols-2">
                 {product.drawing && (
                   <figure>
@@ -183,7 +242,7 @@ export default function Product() {
               </div>
             )}
 
-            {current === 'documents' && (
+            {tab.id === 'documents' && (
               <div className="max-w-3xl">
                 <RowList>
                   {product.documents.map((doc) => (
@@ -203,6 +262,8 @@ export default function Product() {
               </div>
             )}
           </div>
+            )
+          })}
         </Container>
       )}
     </>

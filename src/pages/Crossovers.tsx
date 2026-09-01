@@ -2,19 +2,35 @@ import { Fragment } from 'react'
 import Container from '../components/Container'
 import PageHeader from '../components/PageHeader'
 import { RowList, Row, RowGroupHeading, ArrowIcon } from '../components/RowList'
+import Seo from '../components/Seo'
 import { crossovers, groupByCategory } from '../lib/catalog'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import { partner } from '../config'
+import { titles } from '../lib/seo'
+import { collection, graph } from '../lib/jsonLd'
 
 const INTRO =
   'Recommended processor settings for each system configuration: crossover points, slopes, delay, polarity and gain.'
 
 export default function Crossovers() {
-  useDocumentTitle('Crossover Settings', INTRO)
-
   const groups = groupByCategory(crossovers)
 
   return (
     <>
+      <Seo
+        title={titles.crossovers}
+        description={
+          `Recommended DSP and crossover settings for ${crossovers.length} ` +
+          `${partner.name} system configurations — crossover points, slopes, delay, ` +
+          'polarity and gain for each band.'
+        }
+        path="/crossovers"
+        jsonLd={graph(
+          collection(titles.crossovers, '/crossovers', crossovers.map((c) => ({
+            path: `/crossovers/${c.slug}`,
+          }))),
+        )}
+      />
+
       <PageHeader title="Crossover Settings" intro={<p>{INTRO}</p>} />
 
       <Container className="py-section">

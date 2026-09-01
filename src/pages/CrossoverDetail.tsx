@@ -2,8 +2,11 @@ import { useParams } from 'react-router-dom'
 import Container from '../components/Container'
 import PageHeader from '../components/PageHeader'
 import NotFound from './NotFound'
+import Seo from '../components/Seo'
 import { findCrossover } from '../lib/catalog'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
+import { partner } from '../config'
+import { crossoverTitle } from '../lib/seo'
+import { breadcrumbs, crossoverPage, graph } from '../lib/jsonLd'
 import type { CrossoverRow } from '../lib/types'
 
 const COLUMNS: { key: keyof CrossoverRow; label: string; short: string }[] = [
@@ -21,21 +24,47 @@ export default function CrossoverDetail() {
   const { slug } = useParams()
   const crossover = findCrossover(slug)
 
-  useDocumentTitle(crossover?.title ?? 'Not found')
-
   if (!crossover) return <NotFound />
+
+  const path = `/crossovers/${crossover.slug}`
+  const bands = crossover.rows.length
+  const components = [...new Set(crossover.rows.map((row) => row.component))].filter(Boolean)
+
+  const intro =
+    `Recommended ${partner.name} processor settings for ${crossover.title} — ` +
+    `crossover points, slopes, delay, polarity and gain across ${bands} ` +
+    `${bands === 1 ? 'band' : 'bands'}` +
+    (components.length ? ` (${components.join(', ')}).` : '.')
 
   return (
     <>
+      <Seo
+        title={crossoverTitle(crossover.title)}
+        description={intro}
+        path={path}
+        type="article"
+        jsonLd={graph(
+          crossoverPage(crossover, path),
+          breadcrumbs([
+            { name: 'Crossover Settings', path: '/crossovers' },
+            { name: crossover.title, path },
+          ]),
+        )}
+      />
+
       <PageHeader
         title={crossover.title}
         crumbs={[
           { label: 'Crossovers', to: '/crossovers' },
           ...(crossover.categoryTitle ? [{ label: crossover.categoryTitle }] : []),
         ]}
+        intro={<p>{intro}</p>}
       />
 
       <Container className="py-section">
+        <h2 className="caps mb-8 text-xs text-bright">
+          {bands} {bands === 1 ? 'Band' : 'Bands'}
+        </h2>
 
         <div className="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:px-0">
           <table className="w-full min-w-[720px] border border-line text-left">
