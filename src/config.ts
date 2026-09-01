@@ -46,3 +46,9 @@ export const nav = [
   { label: 'Crossovers', to: '/crossovers' },
   { label: 'Support', to: '/support' },
 ] as const
+
+export const footerNav = [
+  { label: 'Products', to: '/products' },
+  { label: `Complete ${partner.name} Range`, to: '/products/range' },
+  { label: 'Support', to: '/support' },
+] as const

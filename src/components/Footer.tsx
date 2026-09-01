@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Container from './Container'
 import Logo from './Logo'
-import { contact, nav, partner, site } from '../config'
+import { contact, footerNav, site } from '../config'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -46,21 +46,13 @@ export default function Footer() {
           <div>
             <h2 className="caps mb-6 text-xs text-faint">Site</h2>
             <ul className="space-y-3 text-[15px]">
-              {nav.map((item) => (
+              {footerNav.map((item) => (
                 <li key={item.to}>
                   <Link to={item.to} className="transition-colors hover:text-bright">
                     {item.label}
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  to="/products/range"
-                  className="transition-colors hover:text-bright"
-                >
-                  Complete {partner.name} Range
-                </Link>
-              </li>
             </ul>
           </div>
 
