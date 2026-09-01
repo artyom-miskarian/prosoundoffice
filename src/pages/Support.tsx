@@ -33,15 +33,20 @@ export default function Support() {
       <PageHeader title={supportSection.title} intro={<p>{supportSection.intro}</p>} />
 
       <Container className="py-section">
-        <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:gap-20">
-          <div>
-            <h2 className="caps mb-6 text-xs text-bright">{supportSection.formTitle}</h2>
+        <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:grid-rows-[auto_1fr] lg:gap-x-20 lg:gap-y-8">
+          <div className="lg:row-span-2 lg:grid lg:grid-rows-subgrid">
+            <h2 className="caps mb-6 text-2xl sm:text-3xl lg:mb-0 lg:self-baseline">
+              {supportSection.formTitle}
+            </h2>
             <ContactForm />
           </div>
 
-          <aside className="space-y-12">
-            <div>
-              <h2 className="caps mb-6 text-xs text-faint">Get in touch</h2>
+          <aside className="lg:row-span-2 lg:grid lg:grid-rows-subgrid">
+            <h2 className="caps mb-6 text-xs text-faint lg:mb-0 lg:self-baseline">
+              Get in touch
+            </h2>
+
+            <div className="space-y-12">
               <dl className="space-y-5">
                 {DETAILS.map((detail) => (
                   <div key={detail.label}>
@@ -63,24 +68,24 @@ export default function Support() {
                   </div>
                 ))}
               </dl>
-            </div>
 
-            <div>
-              <h2 className="caps mb-6 text-xs text-faint">Resources</h2>
-              <RowList>
-                <Row
-                  label="Downloads"
-                  meta={`${archives.length} archives`}
-                  to="/downloads"
-                  icon={<ArrowIcon />}
-                />
-                <Row
-                  label="Crossovers"
-                  meta={`${crossovers.length} configs`}
-                  to="/crossovers"
-                  icon={<ArrowIcon />}
-                />
-              </RowList>
+              <div>
+                <h2 className="caps mb-6 text-xs text-faint">Resources</h2>
+                <RowList>
+                  <Row
+                    label="Downloads"
+                    meta={`${archives.length} archives`}
+                    to="/downloads"
+                    icon={<ArrowIcon />}
+                  />
+                  <Row
+                    label="Crossovers"
+                    meta={`${crossovers.length} configs`}
+                    to="/crossovers"
+                    icon={<ArrowIcon />}
+                  />
+                </RowList>
+              </div>
             </div>
           </aside>
         </div>
