@@ -107,17 +107,16 @@ export default function Home() {
         <Container>
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <img
-                src="/images/brand/funktion-one.webp"
-                alt={`${partner.name} logo`}
-                className="h-7 w-auto sm:h-9"
-                loading="lazy"
-                decoding="async"
-              />
-              <h2 className="caps mt-8 text-2xl sm:text-3xl">
-                {partner.name} in Armenia
+              <h2>
+                <img
+                  src="/images/brand/funktion-one.webp"
+                  alt={partner.name}
+                  className="h-7 w-auto sm:h-9"
+                  loading="lazy"
+                  decoding="async"
+                />
               </h2>
-              <p className="mt-8 text-lg leading-relaxed text-bright sm:text-xl">
+              <p className="mt-10 text-lg leading-relaxed text-bright sm:text-xl">
                 {partnerSection.lead}
               </p>
               <p className="mt-6 text-[15px] leading-relaxed">{partnerSection.body}</p>
